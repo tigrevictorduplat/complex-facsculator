@@ -1,0 +1,6 @@
+# Ignora a pasta de configurações e cache do Visual Studio
+.vs/
+
+# Recomendado: Ignora também as pastas de compilação (binários)
+[Bb]in/
+[Oo]bj/
