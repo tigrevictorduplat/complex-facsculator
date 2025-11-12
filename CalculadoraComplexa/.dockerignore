@@ -1,0 +1,3 @@
+# Ignora os artefatos de build e debug locais
+**/bin/
+**/obj/

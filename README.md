@@ -26,19 +26,25 @@ O projeto é "containerizado" para garantir que ele funcione em qualquer máquin
 
 ### 2. Construir (Build) a Imagem
 
-Clone este repositório, abra um terminal na pasta raiz do projeto e execute o comando de build:
+1.  **Abra seu terminal** na raiz do repositório (ex: `complex-facsculator`).
 
-```bash
-docker build -t complex-facsculator .
-````
+2.  **Navegue para dentro** da pasta do projeto:
 
-### 3. Executar (Run) a Calculadora
+    ```bash
+    cd CalculadoraComplexa
+    ```
 
-Após o build, execute o container em modo interativo (`-it`) para poder digitar as expressões:
+3.  **Execute o build** na pasta do projeto:
 
-```bash
-docker run -it --rm complex-facsculator
-```
+    ```bash
+    docker build -t complex-facsculator .
+    ```
+
+4.  **Execute o container** para testar:
+
+    ```bash
+    docker run --rm complex-facsculator
+    ```
 
 -----
 
