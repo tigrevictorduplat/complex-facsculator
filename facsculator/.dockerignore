@@ -1,0 +1,7 @@
+# Ignora a pasta de build do Maven
+target/
+
+# Ignora logs e arquivos do Maven
+.mvn/
+mvnw
+mvnw.cmd
