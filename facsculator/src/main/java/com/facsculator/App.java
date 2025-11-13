@@ -1,8 +1,25 @@
 package com.facsculator;
 
+import java.util.List;
+
 public class App {
     public static void main(String[] args) {
-        System.out.println("--- Teste da Calculadora Complexa (Fase 1 - Java) ---");
+       System.out.println("""
+         _______    ___       ______     _______.  ______  __    __   __          ___   .___________.  ______   .______      \r
+        |   ____|  /   \\     /      |   /       | /      ||  |  |  | |  |        /   \\  |           | /  __  \\  |   _  \\     \r
+        |  |__    /  ^  \\   |  ,----'  |   (----`|  ,----'|  |  |  | |  |       /  ^  \\ `---|  |----`|  |  |  | |  |_)  |    \r
+        |   __|  /  /_\\  \\  |  |        \\   \\    |  |     |  |  |  | |  |      /  /_\\  \\    |  |     |  |  |  | |      /     \r
+        |  |    /  _____  \\ |  `----.----)   |   |  `----.|  `--'  | |  `----./  _____  \\   |  |     |  `--'  | |  |\\  \\----.\r
+        |__|   /__/     \\__\\ \\______|_______/     \\______| \\______/  |_______/__/     \\__\\  |__|      \\______/  | _| `._____|\r
+                                                                                                                            \s""");
+        System.out.println("=========================================================================================================================");
+        System.out.println("Calculadora Científica de Números Complexos");
+
+        TesteFase2();
+    }
+
+    public static void TestesFase1() {
+         System.out.println("--- Teste da Calculadora Complexa (Fase 1) ---");
         System.out.println("Este programa testa o record ComplexNumber e suas operações.");
 
         // Criando números (Regra 0)
@@ -21,7 +38,7 @@ public class App {
         // Teste de Aritmética (Regra 1)
         System.out.println("\n--- Teste Aritmética (Regra 1) ---");
         // Em Java, usamos os métodos: .add(), .subtract(), etc.
-        System.out.println("(" + c1 + ") + (" + c2 + ") = " + c1.add(c2)); // Esperado: 4 + 2i
+        System.out.println("(" + c1 + ") + (" + c2 + ") = " + c1.sum(c2)); // Esperado: 4 + 2i
         System.out.println("(" + c1 + ") - (" + c2 + ") = " + c1.subtract(c2)); // Esperado: 2 + 6i
         System.out.println("(" + c1 + ") * (" + c2 + ") = " + c1.multiply(c2)); // Esperado: 11 - 2i
         System.out.println("(" + c1 + ") / (" + c2 + ") = " + c1.divide(c2)); // Esperado: -1 + 2i
@@ -56,4 +73,30 @@ public class App {
 
         System.out.println("\n--- Testes da Fase 1 Concluídos ---");
     }
+    public static void TesteFase2() {
+        // Testa o Tokenizer (Fase 2)
+        System.out.println("--- Teste do Tokenizer (Fase 2) ---");
+        
+        // String de teste complexa
+        String expressao = "(6+2i) * y - 25 / (1+i**2)";
+        
+        try {
+            Tokenizer tokenizer = new Tokenizer(expressao);
+            List<Token> tokens = tokenizer.tokenize();
+            
+            System.out.println("Expressão: " + expressao);
+            System.out.println("Tokens encontrados:");
+            for (Token token : tokens) {
+                System.out.println(token);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao tokenizar: " + e.getMessage());
+        }
+        System.out.println("\n--- Testes da Fase 2 Concluídos ---");    
+    }
+    
+
 }
+    
+

@@ -176,3 +176,59 @@ Este método calcula a $\sqrt[n]{z}$ (raiz n-ésima de $z$).
     ```
 
 *(OBS: Matematicamente, existem 'n' raízes para qualquer $\sqrt[n]{z}$. Esta função retorna a **raiz principal**, que é o padrão para calculadoras científicas).*
+
+## 🧠 O Processo de Tokenização
+
+Para que a calculadora entenda uma expressão como `(3+4i) * x`, devemos quebrar a string da expressão recebida  em "peças" lógicas, chamadas **Tokens**. Este processo é o que chamamos de **Análise Léxica**, e o `Tokenizer.java` é a classe que faz esse trabalho.
+
+Esta processo de Tokenização introduz três novos componentes no projeto.
+
+### `TokenType.java` (Classificação de Tokens)
+
+Esta classe simples é um `enum` que define todas as "categorias" possíveis para um token. Ele nos permite classificar cada "peça" da expressão no seguintes "grupos":
+
+* **Valores:** `COMPLEX_NUMBER`, `VARIABLE`
+* **Operadores:** `PLUS`, `MINUS`, `MULTIPLY`, `DIVIDE`, `POWER`
+* **Funções:** `CONJUGATE`, `ROOT`
+* **Símbolos:** `LEFT_PAREN` ( `(` ), `RIGHT_PAREN` ( `)` ), `LEFT_BRACKET` ( `[` ), `RIGHT_BRACKET` ( `]` )
+* **Controle:** `END_OF_FILE` (para marcar o fim da expressão)
+
+### `Token.java` (Contêiner de Dados)
+
+Este é um `record` simples que age como um contêiner. Ele "armazena" a informação de cada token. Cada `Token` gerado pelo `Tokenizer` possui:
+
+1.  Um `TokenType` (o tipo, vindo do `enum`).
+2.  Um `String text` (o valor original do texto, ex: `"3+4i"`, `"x"`, `"*"`).
+
+Ao final do processo, o `Tokenizer` gera um `List<Token>`.
+
+### `Tokenizer.java` (O Motor de Análise)
+
+Esta é a classe principal desta fase. Ela implementa um **Lexer Inteligente** (*Smart Lexer*).
+
+* **Objetivo:** Consumir a string de expressão caractere por caractere (usando `position`) e produzir a `List<Token>`.
+* **Métodos Auxiliares:** Utiliza métodos de apoio cruciais para "olhar" a string:
+    * `peek()`: "Espia" o caractere atual sem consumí-lo.
+    * `advance()`: Consome o caractere atual e avança o ponteiro.
+    * `peekNext()`: "Espia" o próximo caractere, essencial para tokens de 2 símbolos (como `**`).
+* **Scanners:** Possui "scanners" dedicados para agrupar tokens complexos:
+    * `scanIdentifier()`: Lê uma palavra e decide se é uma `VARIABLE` (como `x`), uma `FUNCTION` (como `conj`), ou o número `i`.
+    * `scanNumber()`: O método mais complexo. É projetado para "devorar" um número complexo inteiro (ex: `5.5-2i`, `-i`, `+3.1`) como um único token `COMPLEX_NUMBER`.
+
+#### A Lógica de Ambiguidade ( `+` e `-` )
+
+A parte mais "inteligente" do `Tokenizer` é sua capacidade de resolver a **ambiguidade** dos símbolos `+` e `-`. Ele precisa saber a diferença entre:
+
+* **Operador Binário:** `5 - 3` (o `-` é uma subtração).
+* **Sinal Unário:** `(-3)` (o `-` é parte do número).
+
+Ele faz isso usando uma lógica de **Contexto + Confirmação**:
+
+1.  **Contexto (`isSign`):** Ele olha para o *token anterior*. Um sinal unário é esperado no **início** da expressão, ou após um **`(`** ou outro **operador** (ex: `5 * -3`).
+2.  **Confirmação (`peekNext()`):** Ele olha para o *próximo caractere*. Um sinal unário deve ser seguido por um **dígito** ou um **`i`** (ex: `-5`, `-i`).
+
+Se ambas as condições são verdadeiras, ele chama o `scanNumber()`. Caso contrário, ele cria um token `PLUS` ou `MINUS` (operador).
+
+#### Detecção de Erros
+
+Se o `Tokenizer` encontra um caractere que não reconhece (como `@` ou `#`), ele lança uma `Exception`, rejeitando a expressão por segurança. 

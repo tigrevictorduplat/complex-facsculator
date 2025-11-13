@@ -92,7 +92,7 @@ public record ComplexNumber(double real, double imaginary) {
      * @param other O outro número complexo (c+di) a ser somado.
      * @return Um novo ComplexNumber com o resultado da soma.
      */
-    public ComplexNumber add(ComplexNumber other) {
+    public ComplexNumber sum(ComplexNumber other) {
         return new ComplexNumber(this.real + other.real, this.imaginary + other.imaginary);
     }
 
