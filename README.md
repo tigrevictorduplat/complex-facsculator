@@ -1,8 +1,23 @@
-#  Calculadora Científica de Números Complexos (A3)
+# 🧮 Calculadora Científica de Números Complexos (A3)
 
-Este repositório contém o código-fonte do Trabalho A3: uma calculadora científica de números complexos em **Java**, capaz de analisar e executar expressões matemáticas.
+Este repositório contém o código-fonte do Trabalho A3: uma calculadora científica de números complexos em **Java**, capaz de analisar e executar expressões matemáticas, seguindo estritamente as regras de compilação e estruturas de dados (AST).
 
-O projeto segue estritamente as regras definidas na especificação do trabalho, incluindo a análise de expressões com árvores (AST) e a exibição da árvore em notação LISP.
+## 📑 Índice
+
+1. [Sobre o Projeto](#-calculadora-científica-de-números-complexos-a3)
+2. [Integrantes](#-integrantes)
+3. [Tecnologias Utilizadas](#-tecnologias-utilizadas)
+4. [Como Executar (Docker)](#-como-executar-via-docker)
+5. [Casos de Uso (Exemplos)](#-casos-de-uso-showcase)
+6. [Arquitetura: Números Complexos](#-arquitetura-do-código)
+    - [Matemática: Potência e Raiz](#-explicação-lógica-e-matemática-power-e-raiz-nthroot)
+7. [Fase 1: Tokenização (Lexer)](#-o-processo-de-tokenização)
+8. [Fase 2: Estrutura da Árvore (AST)](#-a-estrutura-da-árvore-ast)
+9. [Fase 3: Análise Sintática (Parser)](#-análise-sintática---parserjava)
+10. [Fase 4: Execução e Interface (Evaluator)](#-evaluatorjava-e-a-interface-do-usuário)
+11. [Interface de Linha de Comando (CLI)](#-interface-de-linha-de-comando-cli)
+
+---
 
 ## 👥 Integrantes
 
@@ -72,19 +87,20 @@ Testes de potência, radiciação e logaritmos (Regra 1 e melhorias).
 | **Raiz Quadrada** | `root[2](-4)` | `2i` | Raiz de número negativo. |
 | **Raiz Cúbica** | `root[3](-8)` | `1 + 1.732...i` | Raiz principal cúbica. |
 | **Conjugado** | `conj(3+4i)` | `3 - 4i` | Inverte parte imaginária. |
-| **Potência Complexa** | `i ** i` | `0.2078...` | $i^i$ é um número real! |
+| **Potência Complexa** | `i ** i` | `0.2078...` | $i^i$ é um número real\! |
 
 ### 🧩 Funcionalidades do Sistema
+
 Testes das regras de interface, variáveis e árvore.
 
-* **Resoluão de Variáveis:**
+  * **Resolução de Variáveis:**
     ```text
     CALC> x + 10
     >> Defina o valor para 'x': 5i
     => Resultado: 10 + 5i
     ```
 
-* **Verificação de Igualdade:**
+  * **Verificação de Igualdade:**
     ```text
     CALC> check (1+i)**2 == 2i
     => Resultado 1: 2i
@@ -92,7 +108,7 @@ Testes das regras de interface, variáveis e árvore.
     AS EXPRESSÕES SÃO IGUAIS.
     ```
 
-* **Visualização da Árvore:**
+  * **Visualização da Árvore:**
     ```text
     CALC> tree 3 * root[2](x)
     => Árvore LISP: (* 3 (root[2] x))
@@ -102,7 +118,7 @@ Testes das regras de interface, variáveis e árvore.
 
 Esta seção documenta os principais módulos do sistema.
 
-### (`ComplexNumber.java`)
+### `ComplexNumber.java`
 
   * **Representação:** A classe foi implementada como um `record` do Java (Java 16+). Isso garante **imutabilidade** (um número complexo, uma vez criado, não pode ser alterado) e fornece automaticamente construtores, acesso, `equals()` e `hashCode()`.
   * **Atributos:** `real()` (double) e `imaginary()` (double), acessados como métodos.
@@ -112,7 +128,7 @@ Esta seção documenta os principais módulos do sistema.
       * `power(n)`: Implementa a potenciação usando a **Fórmula de De Moivre**, convertendo o número para coordenadas polares (Magnitude e Fase).
       * `nthRoot(n)`: Implementa a radiciação (raiz principal) através da `power(1.0 / n)`.
   * **Exibição:** O método `toString()` foi sobrescrito para formatar a saída de forma limpa, tratando casos especiais como números reais puros (`5`), imaginários puros (`7i` ou `i`) e formatação de sinal (`3 - 4i` ou `3 - i`).
-  * **Segurança:** O método `.divide()` detecta ativamente a divisão por zero (denominador \< 1e-9) e lança uma `ArithmeticException` customizada.
+  * **Tratamento de Erros:** O método `.divide()` detecta ativamente a divisão por zero (denominador \< 1e-9) e lança uma `ArithmeticException` customizada.
 
 -----
 
@@ -226,7 +242,7 @@ Este método calcula a $\sqrt[n]{z}$ (raiz n-ésima de $z$).
 
 *(OBS: Matematicamente, existem 'n' raízes para qualquer $\sqrt[n]{z}$. Esta função retorna a **raiz principal**, que é o padrão para calculadoras científicas).*
 
-### 4. Generalização da Potência (Expoentes Complexos)
+### 4\. Generalização da Potência (Expoentes Complexos)
 
 Além da Fórmula de De Moivre (usada para expoentes reais e raízes), implementamos a **Potenciação Complexa Generalizada** para suportar casos como $(2+i)^{(1+i)}$.
 
@@ -234,24 +250,25 @@ Utilizamos a identidade baseada no Logaritmo Complexo e na Exponencial Complexa:
 $$z^w = e^{w \cdot \ln(z)}$$
 
 Onde implementamos:
-* **Logaritmo Natural:** $\ln(z) = \ln(|z|) + i \cdot \arg(z)$
-* **Exponencial:** $e^{a+bi} = e^a (\cos b + i \sin b)$
+
+  * **Logaritmo Natural:** $\ln(z) = \ln(|z|) + i \cdot \arg(z)$
+  * **Exponencial:** $e^{a+bi} = e^a (\cos b + i \sin b)$
 
 ## 🧠 O Processo de Tokenização
 
 Para que a calculadora entenda uma expressão como `(3+4i) * x`, devemos quebrar a string da expressão recebida  em "peças" lógicas, chamadas **Tokens**. Este processo é o que chamamos de **Análise Léxica**, e o `Tokenizer.java` é a classe que faz esse trabalho.
 
-Esta processo de Tokenização introduz três novos componentes no projeto.
+Este processo de Tokenização introduz três novos componentes no projeto.
 
 ### `TokenType.java` - Classificação de Tokens
 
 Esta classe simples é um `enum` que define todas as "categorias" possíveis para um token. Ele nos permite classificar cada "peça" da expressão no seguintes "grupos":
 
-* **Valores:** `COMPLEX_NUMBER`, `VARIABLE`
-* **Operadores:** `PLUS`, `MINUS`, `MULTIPLY`, `DIVIDE`, `POWER`
-* **Funções:** `CONJUGATE`, `ROOT`
-* **Símbolos:** `LEFT_PAREN` ( `(` ), `RIGHT_PAREN` ( `)` ), `LEFT_BRACKET` ( `[` ), `RIGHT_BRACKET` ( `]` )
-* **Controle:** `END_OF_FILE` (para marcar o fim da expressão)
+  * **Valores:** `COMPLEX_NUMBER`, `VARIABLE`
+  * **Operadores:** `PLUS`, `MINUS`, `MULTIPLY`, `DIVIDE`, `POWER`
+  * **Funções:** `CONJUGATE`, `ROOT`
+  * **Símbolos:** `LEFT_PAREN` ( `(` ), `RIGHT_PAREN` ( `)` ), `LEFT_BRACKET` ( `[` ), `RIGHT_BRACKET` ( `]` )
+  * **Controle:** `END_OF_FILE` (para marcar o fim da expressão)
 
 ### `Token.java`
 
@@ -266,21 +283,21 @@ Ao final do processo, o `Tokenizer` gera um `List<Token>`.
 
 Esta é a classe principal desta fase. Ela implementa um **Lexer Inteligente** (*Smart Lexer*).
 
-* **Objetivo:** Consumir a string de expressão caractere por caractere (usando `position`) e produzir a `List<Token>`.
-* **Métodos Auxiliares:** Utiliza métodos de apoio cruciais para "olhar" a string:
-    * `peek()`: "Espia" o caractere atual sem consumí-lo.
-    * `advance()`: Consome o caractere atual e avança o ponteiro.
-    * `peekNext()`: "Espia" o próximo caractere, essencial para tokens de 2 símbolos (como `**`).
-* **Scanners:** Possui "scanners" dedicados para agrupar tokens complexos:
-    * `scanIdentifier()`: Lê uma palavra e decide se é uma `VARIABLE` (como `x`), uma `FUNCTION` (como `conj`), ou o número `i`.
-    * `scanNumber()`: O método mais complexo. É projetado para consumir um número complexo inteiro (ex: `5.5-2i`, `-i`, `+3.1`) como um único token `COMPLEX_NUMBER`.
+  * **Objetivo:** Consumir a string de expressão caractere por caractere (usando `position`) e produzir a `List<Token>`.
+  * **Métodos Auxiliares:** Utiliza métodos de apoio cruciais para "olhar" a string:
+      * `peek()`: "Espia" o caractere atual sem consumí-lo.
+      * `advance()`: Consome o caractere atual e avança o ponteiro.
+      * `peekNext()`: "Espia" o próximo caractere, essencial para tokens de 2 símbolos (como `**`).
+  * **Scanners:** Possui "scanners" dedicados para agrupar tokens complexos:
+      * `scanIdentifier()`: Lê uma palavra e decide se é uma `VARIABLE` (como `x`), uma `FUNCTION` (como `conj`), ou o número `i`.
+      * `scanNumber()`: O método mais complexo. É projetado para consumir um número complexo inteiro (ex: `5.5-2i`, `-i`, `+3.1`) como um único token `COMPLEX_NUMBER`.
 
 #### A Lógica de Ambiguidade ( `+` e `-` )
 
 A lógica mais refinada do `Tokenizer` é sua capacidade de resolver a **ambiguidade** dos símbolos `+` e `-`. Ele precisa saber a diferença entre:
 
-* **Operador Binário:** `5 - 3` (o `-` é uma subtração).
-* **Sinal Unário:** `(-3)` (o `-` é parte do número).
+  * **Operador Binário:** `5 - 3` (o `-` é uma subtração).
+  * **Sinal Unário:** `(-3)` (o `-` é parte do número).
 
 Ele faz isso usando uma lógica de **Contexto + Confirmação**:
 
@@ -291,8 +308,7 @@ Se ambas as condições são verdadeiras, ele chama o `scanNumber()`. Caso contr
 
 #### Detecção de Erros
 
-Se o `Tokenizer` encontra um caractere que não reconhece (como `@` ou `#`), ele lança uma `Exception`, rejeitando a expressão por segurança. 
-
+Se o `Tokenizer` encontra um caractere que não reconhece (como `@` ou `#`), ele lança uma `Exception`, rejeitando a expressão por segurança.
 
 ## 🌳 A Estrutura da Árvore (AST)
 
@@ -303,29 +319,34 @@ Utilizamos o **Padrão de Projeto Composite**, onde todos os elementos da árvor
 ### A Interface `ASTNode`
 
 A interface define o contrato para qualquer nó da árvore.
-* **Notação LISP:** A interface obriga que todo nó implemente o método `toLispString()`. Isso garante que a árvore possa se auto-descrever textualmente no formato LISP (ex: `(+ 3 (* 2 x))`).
+
+  * **Notação LISP:** A interface obriga que todo nó implemente o método `toLispString()`. Isso garante que a árvore possa se auto-descrever textualmente no formato LISP (ex: `(+ 3 (* 2 x))`).
 
 ### 🍃 Nós Folha (Valores)
+
 São os nós que ficam nas pontas da árvore e não possuem filhos.
-* **`NumberNode`:** Armazena um objeto `ComplexNumber` já resolvido.
-    * *LISP:* Retorna o próprio número (ex: `3 + 4i`).
-* **`VariableNode`:** Armazena o nome de uma variável (ex: `"x"`). Seu valor só será descoberto na fase de execução.
-    * *LISP:* Retorna o nome da variável (ex: `x`).
+
+  * **`NumberNode`:** Armazena um objeto `ComplexNumber` já resolvido.
+      * *LISP:* Retorna o próprio número (ex: `3 + 4i`).
+  * **`VariableNode`:** Armazena o nome de uma variável (ex: `"x"`). Seu valor só será descoberto na fase de execução.
+      * *LISP:* Retorna o nome da variável (ex: `x`).
 
 ### 🪵 Nós Galho (Operações)
+
 São nós compostos que conectam outros nós.
-* **`BinaryOperationNode`:** Representa operações matemáticas padrão (Soma, Subtração, Multiplicação, Divisão, Potência). Contém um nó à esquerda (`left`), um operador e um nó à direita (`right`).
-    * *LISP:* `(OPERADOR ESQ DIR)` -> Ex: `(+ 3 5)`.
-* **`UnaryOperationNode`:** Representa operações sobre um único valor, como a função conjugado `conj(z)`.
-    * *LISP:* `(FUNC OPERANDO)` -> Ex: `(conj 3+4i)`.
+
+  * **`BinaryOperationNode`:** Representa operações matemáticas padrão (Soma, Subtração, Multiplicação, Divisão, Potência). Contém um nó à esquerda (`left`), um operador e um nó à direita (`right`).
+      * *LISP:* `(OPERADOR ESQ DIR)` -\> Ex: `(+ 3 5)`.
+  * **`UnaryOperationNode`:** Representa operações sobre um único valor, como a função conjugado `conj(z)`.
+      * *LISP:* `(FUNC OPERANDO)` -\> Ex: `(conj 3+4i)`.
 
 ### √ Nó de Radiciação: `NthRootNode`
 
 Representa a operação matemática de radiciação (Raiz N-ésima). Diferente de uma operação binária comum, a raiz possui um parâmetro fixo inteiro (o grau da raiz).
 
-* **Estrutura:** `root[grau](radicando)`
-* **Por que um nó separado?** Isso garante a **tipagem forte** do grau da raiz (exigindo que seja um `int`) e facilita a validação da **Tratamento de Erro -** (evitando graus inválidos como zero ou números complexos no índice da raiz).
-* *LISP:* `(root[grau] radicando)` -> Ex: `(root[3] x)`.
+  * **Estrutura:** `root[grau](radicando)`
+  * **Por que um nó separado?** Isso garante a **tipagem forte** do grau da raiz (exigindo que seja um `int`) e facilita a validação da Regra 5 (evitando graus inválidos como zero ou números complexos no índice da raiz).
+  * *LISP:* `(root[grau] radicando)` -\> Ex: `(root[3] x)`.
 
 ## 🏗️ Análise Sintática - Parser.java
 
@@ -337,63 +358,75 @@ Utilizamos o algoritmo **Recursive Descent Parser** (Descida Recursiva). A ideia
 
 Abaixo, descrevemos os métodos principais na ordem de chamada (do menor para a maior precedência).
 
-#### 1. `parse()`
-* **Função:** É o ponto de entrada. Inicia a análise chamando `expression()`.
-* **Validação:** Após montar a árvore, ele verifica se o token atual é do tipo `EOF` (Fim de Arquivo). Se houver tokens sobrando (ex: `(2+2) 5` - o `5` sobra), ele lança uma exceção de sintaxe, rejeitando a expressão.
+#### 1\. `parse()`
 
-#### 2. `expression()` (Soma e Subtração)
-* **Precedência:** Baixa.
-* **Lógica:**
+  * **Função:** É o ponto de entrada. Inicia a análise chamando `expression()`.
+  * **Validação:** Após montar a árvore, ele verifica se o token atual é do tipo `EOF` (Fim de Arquivo). Se houver tokens sobrando (ex: `(2+2) 5` - o `5` sobra), ele lança uma exceção de sintaxe, rejeitando a expressão.
+
+#### 2\. `expression()` (Soma e Subtração)
+
+  * **Precedência:** Baixa.
+  * **Lógica:**
     1.  Chama `term()` para processar o lado esquerdo (garantindo que multiplicações ocorram antes).
-    2.  Entra em um loop `while`: enquanto encontrar tokens `+` ou `-`, ele consome o operador, chama `term()` novamente para o lado direito e cria um novo `BinaryOpNode` combinando os dois.
-* **Retorno:** Um nó representando somas/subtrações ou o resultado de `term()`.
+    2.  Entra em um loop `while`: enquanto encontrar tokens `+` ou `-`, ele consome o operador, chama `term()` novamente para o lado direito e cria um novo `BinaryOperationNode` combinando os dois.
+  * **Retorno:** Um nó representando somas/subtrações ou o resultado de `term()`.
 
-#### 3. `term()` (Multiplicação e Divisão)
-* **Precedência:** Média.
-* **Lógica:** Similar ao `expression`, mas procura por `*` ou `/`. Chama `power()` para obter seus operandos.
-* **Retorno:** Um nó representando multiplicações/divisões ou o resultado de `power()`.
+#### 3\. `term()` (Multiplicação e Divisão)
 
-#### 4. `power()` (Potenciação)
-* **Precedência:** Alta.
-* **Lógica:** Procura pelo token `**`. Chama `unary()` para obter os operandos.
-* **Retorno:** Um nó `BinaryOpNode` do tipo POWER ou o resultado de `unary()`.
+  * **Precedência:** Média.
+  * **Lógica:** Similar ao `expression`, mas procura por `*` ou `/`. Chama `power()` para obter seus operandos.
+  * **Retorno:** Um nó representando multiplicações/divisões ou o resultado de `power()`.
 
-#### 5. `unary()` (Funções e Raízes)
-* **Precedência:** Altíssima.
-* **Lógica:** Verifica se o token atual é uma palavra-chave de função.
-    * **`conj`:** Consome obrigatoriamente `(` + expressão + `)` e retorna um `UnaryOpNode`.
-    * **`root`:** Consome obrigatoriamente `[` + grau (inteiro) + `]` + `(` + expressão + `)` e retorna um `NthRootNode`.
-* **Retorno:** O nó da função ou delega para `primary()`.
+#### 4\. `power()` (Potenciação)
 
-#### 6. `primary()`
-* **Precedência:** Máxima (O fim da recursão).
-* **Lógica:** Trata os elementos base:
-    * **Números:** Converte o texto em `ComplexNumber` e retorna um `NumberNode`.
-    * **Variáveis:** Retorna um `VariableNode`.
-    * **Parênteses `(...)`:** Se encontrar um `(`, ele chama `expression()` **recursivamente**. Isso reinicia a hierarquia de precedência para tudo que estiver dentro dos parênteses.
-* **Erro:** Se o token não for nenhum destes, lança erro de sintaxe.
+  * **Precedência:** Alta.
+  * **Lógica:** Procura pelo token `**`. Chama `unary()` para obter os operandos.
+  * **Retorno:** Um nó `BinaryOperationNode` do tipo POWER ou o resultado de `unary()`.
 
----
+#### 5\. `unary()` (Funções e Raízes)
+
+  * **Precedência:** Altíssima.
+  * **Lógica:** Verifica se o token atual é uma palavra-chave de função.
+      * **`conj`:** Consome obrigatoriamente `(` + expressão + `)` e retorna um `UnaryOperationNode`.
+      * **`root`:** Consome obrigatoriamente `[` + grau (inteiro) + `]` + `(` + expressão + `)` e retorna um `NthRootNode`.
+  * **Retorno:** O nó da função ou delega para `primary()`.
+
+#### 6\. `primary()`
+
+  * **Precedência:** Máxima (O fim da recursão).
+  * **Lógica:** Trata os elementos base:
+      * **Números:** Converte o texto em `ComplexNumber` e retorna um `NumberNode`.
+      * **Variáveis:** Retorna um `VariableNode`.
+      * **Parênteses `(...)`:** Se encontrar um `(`, ele chama `expression()` **recursivamente**. Isso reinicia a hierarquia de precedência para tudo que estiver dentro dos parênteses.
+  * **Erro:** Se o token não for nenhum destes, lança erro de sintaxe.
+
+-----
 
 ### ⚙️ Métodos Auxiliares
 
 Para navegar pela lista de tokens com segurança e aplicar as regras gramaticais, o Parser utiliza métodos auxiliares robustos.
 
 #### `match(TokenType... types)` (Consumo Opcional)
+
 Verifica se o token atual corresponde a algum dos tipos passados.
-* **Lógica:** Se houver correspondência, ele consome o token (avança o ponteiro `current`) e retorna `true`. Se não, retorna `false` sem mexer no ponteiro.
-* **Uso:** Usado para operadores opcionais (ex: verificar se há um `+` depois de um número).
+
+  * **Lógica:** Se houver correspondência, ele consome o token (avança o ponteiro `current`) e retorna `true`. Se não, retorna `false` sem mexer no ponteiro.
+  * **Uso:** Usado para operadores opcionais (ex: verificar se há um `+` depois de um número).
 
 #### `consume(TokenType type, String message)` (Consumo Obrigatório)
+
 Verifica se o token atual é **exatamente** do tipo esperado.
-* **Lógica:**
-    * Se for igual: Consome e retorna o token.
-    * Se for diferente: **Lança uma `RuntimeException`** com a mensagem de erro fornecida.
-* **Uso:** Essencial para validar a estrutura sintática obrigatória (ex: garantir que um `(` seja fechado por um `)`). Isso atende diretamente ao princípio da Detecção de erros.
+
+  * **Lógica:**
+      * Se for igual: Consome e retorna o token.
+      * Se for diferente: **Lança uma `RuntimeException`** com a mensagem de erro fornecida.
+  * **Uso:** Essencial para validar a estrutura sintática obrigatória (ex: garantir que um `(` seja fechado por um `)`). Isso atende diretamente ao princípio da Detecção de erros.
 
 #### `parseComplexString(String text)` (Conversor de Dados)
+
 Como o Tokenizer entrega o número complexo como uma String bruta (ex: `"3+4i"`, `"-i"`, `"5"`), este método converte essa string em um objeto `ComplexNumber`.
-* **Lógica:**
+
+  * **Lógica:**
     1.  Limpa espaços em branco.
     2.  Trata casos isolados (`"i"`, `"-i"`, `"+i"`).
     3.  Busca o ponto de corte: varrendo a string de trás para frente procurando o último `+` ou `-` (que separa a parte real da imaginária).
@@ -401,37 +434,41 @@ Como o Tokenizer entrega o número complexo como uma String bruta (ex: `"3+4i"`,
     5.  **Se achar corte:** Divide a string em duas substrings, faz o *parsing* de cada parte para `double` e instancia o `ComplexNumber(real, imaginary)`.
 
 #### `advance()`, `peek()`, `previous()`
+
 Métodos de baixo nível para gerenciamento do ponteiro da lista.
-* `peek()`: Olha o token atual sem consumir.
-* `advance()`: Consome o token atual e move o ponteiro para o próximo.
-* `previous()`: Retorna o último token consumido (útil para saber qual operador acabamos de passar).
+
+  * `peek()`: Olha o token atual sem consumir.
+  * `advance()`: Consome o token atual e move o ponteiro para o próximo.
+  * `previous()`: Retorna o último token consumido (útil para saber qual operador acabamos de passar).
 
 ## ⚙️ Evaluator.java e a Interface do Usuário
 
 Esta fase implementa o **Evaluator** (responsável por calcular o resultado) e a **App** (a interface interativa).
 
-### 1. O Algoritmo de Avaliação (`Evaluator.java`)
+### 1\. O Algoritmo de Avaliação (`Evaluator.java`)
 
 A classe `Evaluator` percorre a árvore AST para computar o resultado final. Utilizamos uma estratégia de **Travessia em Profundidade (Depth-First Traversal)**.
 
 O método `evaluate(ASTNode node)` identifica o tipo do nó e age recursivamente:
 
 1.  **Nós Folha (Base):**
-    * `NumberNode`: Retorna imediatamente o valor complexo armazenado.
-    * `VariableNode`: Aciona o sistema de resolução de variáveis (veja abaixo).
+
+      * `NumberNode`: Retorna imediatamente o valor complexo armazenado.
+      * `VariableNode`: Aciona o sistema de resolução de variáveis (veja abaixo).
 
 2.  **Nós de Operação (Recursão):**
-    * `BinaryOpNode` (ex: Soma, Multiplicação, etc): Primeiro resolve o lado **Esquerdo**, depois o **Direito**, e só então aplica a operação matemática.
-    * **Suporte a Multiplicação Implícita:** Expressões como `2x` ou `3(a+b)` são tratadas automaticamente como multiplicações durante a execução.
 
-### 2. Gestão de Variáveis Interativa
+      * `BinaryOperationNode` (ex: Soma, Multiplicação, etc): Primeiro resolve o lado **Esquerdo**, depois o **Direito**, e só então aplica a operação matemática.
+      * **Suporte a Multiplicação Implícita:** Expressões como `2x` ou `3(a+b)` são tratadas automaticamente como multiplicações durante a execução.
+
+### 2\. Gestão de Variáveis Interativa
 
 O sistema de variáveis é dinâmico e interativo.
+
 1.  **Memória:** Um `HashMap` armazena os valores definidos (ex: `x = 2+i`).
 2.  **Interatividade:** Se o avaliador encontra uma variável desconhecida, ele **pausa a execução** e solicita o valor ao usuário.
 3.  **Recursão de Input:** O usuário não precisa digitar apenas números. Ele pode definir `x` como uma expressão (ex: `10 * 5`). O sistema usa o próprio Parser para calcular o valor da variável em tempo real.
 
----
 
 ## 🖥️ Interface de Linha de Comando (CLI)
 
@@ -441,11 +478,11 @@ A classe `App.java` implementa o loop principal do programa (REPL - Read-Eval-Pr
 
 Além de calcular expressões matemáticas padrão, o sistema reconhece comandos especiais:
 
-* **`help` ou `demo`:** Exibe um guia rápido com exemplos de sintaxe e casos de uso.
-* **`menu`:** Exibe o menu inicial com todos os comandos da CLI.
-* **`tree <expressão>` (Regra 6):** Exibe a estrutura interna da Árvore de Sintaxe Abstrata em notação LISP.
-    * *Ex:* `tree 2*x` -> `(* 2 x)`
-* **`check <expr1> == <expr2>` (Regra 3):** Calcula duas expressões separadamente e verifica se seus resultados são matematicamente iguais (dentro de uma tolerância de precisão).
-    * *Ex:* `check (1+i)^2 == 2i` -> ` AS EXPRESSÕES SÃO IGUAIS`
-* **`clear`:** Limpa a memória de variáveis, permitindo iniciar um novo cálculo do zero.
-* **`quit` ou `exit`:** Encerra a aplicação.
+  * **`help` ou `demo`:** Exibe um guia rápido com exemplos de sintaxe e casos de uso.
+  * **`menu`:** Exibe o menu inicial com todos os comandos da CLI.
+  * **`tree <expressão>` (Regra 6):** Exibe a estrutura interna da Árvore de Sintaxe Abstrata em notação LISP.
+      * *Ex:* `tree 2*x` -\> `(* 2 x)`
+  * **`check <expr1> == <expr2>` (Regra 3):** Calcula duas expressões separadamente e verifica se seus resultados são matematicamente iguais (dentro de uma tolerância de precisão).
+      * *Ex:* `check (1+i)^2 == 2i` -\> `  AS EXPRESSÕES SÃO IGUAIS `
+  * **`clear`:** Limpa a memória de variáveis, permitindo iniciar um novo cálculo do zero.
+  * **`quit` ou `exit`:** Encerra a aplicação.
