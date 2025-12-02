@@ -49,6 +49,55 @@ docker run -it --rm complex-facsculator
 
 -----
 
+## 🧪 Casos de Uso (Showcase)
+
+Abaixo estão exemplos de expressões suportadas pela calculadora. Você pode copiar e colar estes comandos diretamente no terminal da aplicação (`CALC>`).
+
+### 📐 Aritmética Fundamental
+Testes das operações básicas da Regra 1.
+
+| Operação | Entrada (Input) | Resultado Esperado |
+| :--- | :--- | :--- |
+| **Soma** | `3 + 2i + 4 - 5i` | `7 - 3i` |
+| **Multiplicação** | `(1 + i) * (1 - i)` | `2` |
+| **Divisão** | `1 / i` | `-i` |
+| **Precedência** | `2 + 3 * 4i` | `2 + 12i` |
+
+### 🚀 Funções Avançadas
+Testes de potência, radiciação e logaritmos (Regra 1 e melhorias).
+
+| Operação | Entrada (Input) | Resultado Esperado | Descrição |
+| :--- | :--- | :--- | :--- |
+| **Potência Real** | `(1+i) ** 2` | `2i` | Quadrado perfeito. |
+| **Raiz Quadrada** | `root[2](-4)` | `2i` | Raiz de número negativo. |
+| **Raiz Cúbica** | `root[3](-8)` | `1 + 1.732...i` | Raiz principal cúbica. |
+| **Conjugado** | `conj(3+4i)` | `3 - 4i` | Inverte parte imaginária. |
+| **Potência Complexa** | `i ** i` | `0.2078...` | $i^i$ é um número real! |
+
+### 🧩 Funcionalidades do Sistema
+Testes das regras de interface, variáveis e árvore.
+
+* **Resoluão de Variáveis:**
+    ```text
+    CALC> x + 10
+    >> Defina o valor para 'x': 5i
+    => Resultado: 10 + 5i
+    ```
+
+* **Verificação de Igualdade:**
+    ```text
+    CALC> check (1+i)**2 == 2i
+    => Resultado 1: 2i
+    => Resultado 2: 2i
+    AS EXPRESSÕES SÃO IGUAIS.
+    ```
+
+* **Visualização da Árvore:**
+    ```text
+    CALC> tree 3 * root[2](x)
+    => Árvore LISP: (* 3 (root[2] x))
+    ```
+
 ## 🧬 Arquitetura do Código
 
 Esta seção documenta os principais módulos do sistema.
@@ -176,6 +225,17 @@ Este método calcula a $\sqrt[n]{z}$ (raiz n-ésima de $z$).
     ```
 
 *(OBS: Matematicamente, existem 'n' raízes para qualquer $\sqrt[n]{z}$. Esta função retorna a **raiz principal**, que é o padrão para calculadoras científicas).*
+
+### 4. Generalização da Potência (Expoentes Complexos)
+
+Além da Fórmula de De Moivre (usada para expoentes reais e raízes), implementamos a **Potenciação Complexa Generalizada** para suportar casos como $(2+i)^{(1+i)}$.
+
+Utilizamos a identidade baseada no Logaritmo Complexo e na Exponencial Complexa:
+$$z^w = e^{w \cdot \ln(z)}$$
+
+Onde implementamos:
+* **Logaritmo Natural:** $\ln(z) = \ln(|z|) + i \cdot \arg(z)$
+* **Exponencial:** $e^{a+bi} = e^a (\cos b + i \sin b)$
 
 ## 🧠 O Processo de Tokenização
 
@@ -329,19 +389,63 @@ Verifica se o token atual é **exatamente** do tipo esperado.
 * **Lógica:**
     * Se for igual: Consome e retorna o token.
     * Se for diferente: **Lança uma `RuntimeException`** com a mensagem de erro fornecida.
-* **Uso:** Essencial para validar a estrutura sintática obrigatória (ex: garantir que um `(` seja fechado por um `)`). Isso atende diretamente à **Regra 5** (Detecção de erros).
+* **Uso:** Essencial para validar a estrutura sintática obrigatória (ex: garantir que um `(` seja fechado por um `)`). Isso atende diretamente ao princípio da Detecção de erros.
 
 #### `parseComplexString(String text)` (Conversor de Dados)
-Como o Lexer entrega o número complexo como uma String bruta (ex: `"3+4i"`, `"-i"`, `"5"`), este método converte essa string em um objeto `ComplexNumber`.
+Como o Tokenizer entrega o número complexo como uma String bruta (ex: `"3+4i"`, `"-i"`, `"5"`), este método converte essa string em um objeto `ComplexNumber`.
 * **Lógica:**
     1.  Limpa espaços em branco.
     2.  Trata casos isolados (`"i"`, `"-i"`, `"+i"`).
-    3.  Busca o ponto de corte: varre a string de trás para frente procurando o último `+` ou `-` (que separa a parte real da imaginária).
+    3.  Busca o ponto de corte: varrendo a string de trás para frente procurando o último `+` ou `-` (que separa a parte real da imaginária).
     4.  **Se não achar corte:** É imaginário puro (ex: `"5i"`) ou real puro (ex: `"5"`).
-    5.  **Se achar corte:** Divide a string em duas substrings, faz o *parsing* de cada parte para `double` e instancia o `ComplexNumber(real, imag)`.
+    5.  **Se achar corte:** Divide a string em duas substrings, faz o *parsing* de cada parte para `double` e instancia o `ComplexNumber(real, imaginary)`.
 
 #### `advance()`, `peek()`, `previous()`
 Métodos de baixo nível para gerenciamento do ponteiro da lista.
 * `peek()`: Olha o token atual sem consumir.
 * `advance()`: Consome o token atual e move o ponteiro para o próximo.
 * `previous()`: Retorna o último token consumido (útil para saber qual operador acabamos de passar).
+
+## ⚙️ Evaluator.java e a Interface do Usuário
+
+Esta fase implementa o **Evaluator** (responsável por calcular o resultado) e a **App** (a interface interativa).
+
+### 1. O Algoritmo de Avaliação (`Evaluator.java`)
+
+A classe `Evaluator` percorre a árvore AST para computar o resultado final. Utilizamos uma estratégia de **Travessia em Profundidade (Depth-First Traversal)**.
+
+O método `evaluate(ASTNode node)` identifica o tipo do nó e age recursivamente:
+
+1.  **Nós Folha (Base):**
+    * `NumberNode`: Retorna imediatamente o valor complexo armazenado.
+    * `VariableNode`: Aciona o sistema de resolução de variáveis (veja abaixo).
+
+2.  **Nós de Operação (Recursão):**
+    * `BinaryOpNode` (ex: Soma, Multiplicação, etc): Primeiro resolve o lado **Esquerdo**, depois o **Direito**, e só então aplica a operação matemática.
+    * **Suporte a Multiplicação Implícita:** Expressões como `2x` ou `3(a+b)` são tratadas automaticamente como multiplicações durante a execução.
+
+### 2. Gestão de Variáveis Interativa
+
+O sistema de variáveis é dinâmico e interativo.
+1.  **Memória:** Um `HashMap` armazena os valores definidos (ex: `x = 2+i`).
+2.  **Interatividade:** Se o avaliador encontra uma variável desconhecida, ele **pausa a execução** e solicita o valor ao usuário.
+3.  **Recursão de Input:** O usuário não precisa digitar apenas números. Ele pode definir `x` como uma expressão (ex: `10 * 5`). O sistema usa o próprio Parser para calcular o valor da variável em tempo real.
+
+---
+
+## 🖥️ Interface de Linha de Comando (CLI)
+
+A classe `App.java` implementa o loop principal do programa (REPL - Read-Eval-Print Loop).
+
+### Comandos Disponíveis
+
+Além de calcular expressões matemáticas padrão, o sistema reconhece comandos especiais:
+
+* **`help` ou `demo`:** Exibe um guia rápido com exemplos de sintaxe e casos de uso.
+* **`menu`:** Exibe o menu inicial com todos os comandos da CLI.
+* **`tree <expressão>` (Regra 6):** Exibe a estrutura interna da Árvore de Sintaxe Abstrata em notação LISP.
+    * *Ex:* `tree 2*x` -> `(* 2 x)`
+* **`check <expr1> == <expr2>` (Regra 3):** Calcula duas expressões separadamente e verifica se seus resultados são matematicamente iguais (dentro de uma tolerância de precisão).
+    * *Ex:* `check (1+i)^2 == 2i` -> ` AS EXPRESSÕES SÃO IGUAIS`
+* **`clear`:** Limpa a memória de variáveis, permitindo iniciar um novo cálculo do zero.
+* **`quit` ou `exit`:** Encerra a aplicação.

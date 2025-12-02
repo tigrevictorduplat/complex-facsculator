@@ -236,4 +236,38 @@ public record ComplexNumber(double real, double imaginary) {
         // Reutiliza a lógica de potência já implementada.
         return power(exponent);
     }
+
+    // --- Funções Auxiliares para Potência Complexa Generalizada ---
+
+    /**
+     * Calcula o Logaritmo Natural (ln) de um número complexo.
+     * Fórmula: ln(z) = ln(|z|) + i * arg(z)
+     */
+    public ComplexNumber log() {
+        return new ComplexNumber(Math.log(this.magnitude()), this.phase());
+    }
+
+    /**
+     * Calcula a Exponencial (e^z) de um número complexo.
+     * Fórmula: e^(a+bi) = e^a * (cos(b) + i*sin(b))
+     */
+    public ComplexNumber exp() {
+        double eToA = Math.exp(this.real);
+        return new ComplexNumber(eToA * Math.cos(this.imaginary), eToA * Math.sin(this.imaginary));
+    }
+
+    /**
+     * Potência Generalizada: z^w (onde w também é complexo).
+     * Fórmula: z^w = e^(w * ln(z))
+     */
+    public ComplexNumber power(ComplexNumber exponent) {
+        // Se a base for zero, o resultado é zero (exceto 0^0, mas vamos simplificar)
+        if (this.magnitude() < 1e-9) {
+            return new ComplexNumber(0, 0);
+        }
+        
+        // Aplica a fórmula: exp( exponent * log(this) )
+        return this.log().multiply(exponent).exp();
+    }
+
 }

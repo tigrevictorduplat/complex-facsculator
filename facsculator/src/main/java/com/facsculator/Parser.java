@@ -65,13 +65,35 @@ public class Parser {
      * Nível 2: Termo (Multiplicação e Divisão).
      * Regra: power { ( * | / ) power }
      */
-    private ASTNode term() {
-        ASTNode left = power(); // Chama o próximo nível (Potência)
+private ASTNode term() {
+        ASTNode left = power(); // Pega o primeiro fator (ex: 2)
 
-        while (match(TokenType.MULTIPLY, TokenType.DIVIDE)) {
-            Token operatorToken = previous();
-            ASTNode right = power();
-            left = new BinaryOperationNode(left, operatorToken.type(), right);
+        while (true) {
+            // Caso 1: Multiplicação/Divisão Explícita (ex: 2 * x)
+            if (match(TokenType.MULTIPLY, TokenType.DIVIDE)) {
+                Token operatorToken = previous();
+                ASTNode right = power();
+                left = new BinaryOperationNode(left, operatorToken.type(), right);
+            }
+            
+            // Caso 2: Multiplicação Implícita (ex: 2x, 2(x), (a)(b))
+            // Se NÃO houver operador, mas o próximo token for o início de outro valor...
+            // ...nós assumimos que é uma multiplicação.
+            else if (check(TokenType.VARIABLE) ||       // ex: 2x
+                     check(TokenType.LEFT_PAREN) ||     // ex: 2(x)
+                     check(TokenType.COMPLEX_NUMBER) || // ex: (x)2
+                     check(TokenType.CONJUGATE) ||      // ex: 2 conj(z)
+                     check(TokenType.ROOT)) {           // ex: 2 root[2](x)
+                
+                // Criamos o nó de multiplicação, sem consumir token de operador
+                ASTNode right = power();
+                left = new BinaryOperationNode(left, TokenType.MULTIPLY, right);
+            }
+            
+            // Caso 3: Não é nem explícito nem implícito -> Terminou o termo.
+            else {
+                break;
+            }
         }
 
         return left;
